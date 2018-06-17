@@ -86,33 +86,32 @@
     });
   }
 
-  fetch(projectlocation).then(function(response) {
+  var resp = fetch(projectlocation).then(function(response) {
     if (response.status !== 200) {
       throw response.status;
-	}
-    var request = P.IO.loadSB2File(response);
-	request.onload = function (s) {
-    splash.style.display = 'none';
-
-    stage = s;
-    layout();
-
-    s.isTurbo = turbo;
-    s.start();
-    s.triggerGreenFlag();
-
-    player.appendChild(s.root);
-    s.focus();
-    s.handleError = showError;
+    }
+    return response.blob();
+  }).then(function(file_content) {
+    var request = P.IO.loadSB2File(file_content);
+    request.onload = function (s) {
+      splash.style.display = 'none';
+      stage = s;
+      layout();
+      s.isTurbo = turbo;
+      s.start();
+      s.triggerGreenFlag();
+      player.appendChild(s.root);
+      s.focus();
+      s.handleError = showError;
     };
     request.onerror = showError;
     request.onprogress = function (e) {
       progressBar.style.width = (10 + e.loaded / e.total * 90) + '%';
     };
-
-    P.IO.loadSB2File(response, function(title) {
-      document.title = projectTitle = title;
-    });
+    document.title = projectTitle = 'Sliptream Music Disk';
+	return file_content;
+  }).catch(function(status) {
+    console.log('Error ' + status);
   });
 
 }());
