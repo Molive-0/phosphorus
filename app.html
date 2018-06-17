@@ -30,7 +30,7 @@
   'use strict';
 
   var stage;
-  var projectId = 17088932;
+  var projectlocation = 'project/demo.sb2';
   var projectTitle = '';
   var turbo = false;
   var fullScreen = true;
@@ -86,9 +86,12 @@
     });
   }
 
-  var request = P.IO.loadScratchr2Project(projectId);
-
-  request.onload = function (s) {
+  fetch(projectlocation).then(function(response) {
+    if (response.status !== 200) {
+      throw response.status;
+	}
+    var request = P.IO.loadSB2File(response);
+	request.onload = function (s) {
     splash.style.display = 'none';
 
     stage = s;
@@ -101,14 +104,15 @@
     player.appendChild(s.root);
     s.focus();
     s.handleError = showError;
-  };
-  request.onerror = showError;
-  request.onprogress = function (e) {
-    progressBar.style.width = (10 + e.loaded / e.total * 90) + '%';
-  };
+    };
+    request.onerror = showError;
+    request.onprogress = function (e) {
+      progressBar.style.width = (10 + e.loaded / e.total * 90) + '%';
+    };
 
-  P.IO.loadScratchr2ProjectTitle(projectId, function(title) {
-    document.title = projectTitle = title;
+    P.IO.loadSB2File(response, function(title) {
+      document.title = projectTitle = title;
+    });
   });
 
 }());
